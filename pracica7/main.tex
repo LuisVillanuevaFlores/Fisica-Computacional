@@ -1,0 +1,247 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{ragged2e}
+\usepackage{amssymb, amsmath, amsbsy}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage[spanish]{babel}
+\title{kd tree}
+\author{Luis Villanueva  }
+\date{Nomvember 2019}
+\justifying
+\begin{document}
+
+%-------COLORES PARA CODIGO ------------------------
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=JavaScript,
+   basicstyle=\footnotesize\ttfamily,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  commentstyle=\itshape\color{purple!40!black},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+  frame=single,	  
+  numbers=left,
+   numberstyle=\footnotesize,
+}
+
+\lstdefinestyle{customasm}{
+  belowcaptionskip=1\baselineskip,
+  frame=L,
+  xleftmargin=\parindent,
+  language=JavaScript,
+  basicstyle=\footnotesize\ttfamily,
+  commentstyle=\itshape\color{purple!40!black},
+}
+
+\lstset{escapechar=@,style=customc}
+
+%---------------------------------------------
+
+\thispagestyle{empty}
+
+\vfill
+ \begin{center}
+    \begin{figure}[h]
+    \centering
+    \includegraphics[width=12cm]{unsa}\\
+    
+    \end{figure}
+ 	 
+     \vspace*{1.5cm}
+    {\large\bfseries FACULTAD DE PRODUCCIÓN Y SERVICIOS} \\
+    {\large\bfseries ESCUELA PROFESIONAL DE CIENCIA DE LA COMPUTACIÓN}  \\ 
+    
+    \vspace*{1 cm}
+      {\large\bfseries Práctica 6  }
+       \vspace*{0.5 cm}
+      
+    
+ 	\rule[0.5ex]{\linewidth}{2pt}\vspace*{-\baselineskip}\vspace*		{3.2pt}
+	\rule[0.5ex]{\linewidth}{1pt}\\[\baselineskip]
+ 	{\huge Física Computacional} \\[4mm]
+    \rule[0.5ex]{\linewidth}{1pt}\vspace*{-							\baselineskip}\vspace{3.2pt}
+	\rule[0.5ex]{\linewidth}{2pt}\\
+  \vspace*{1 cm}
+
+    \begin{large}
+    \bfseries DOCENTE: \\
+    \bfseries Edwin Llamoca Requena  \\
+     \vspace{5mm}
+    \bfseries ALUMNO:\\
+    \bfseries Luis Guillermo Villanueva Flores \\
+   
+   
+    \end{large}
+    \vspace*{0.4in}
+    \noindent \\
+    
+    \vfill
+    \large\bfseries{ AREQUIPA\\2020}
+\end{center}
+\newpage
+
+
+\begin{flushleft}
+  
+
+\section{Solución aproximada de la ecuación de Onda}
+
+\begin{enumerate}
+    \item Analice el mismo problema, cambiando h y k y verifique sus resultados.
+    \vspace{0.2 cm}
+    Para que en el problema se mantenga y cumpla con la condición de estabilidad, se cambio a h a $0.08$ y a k como $0.03$, de esa forma se obtiene, un r con valor de 0.75, de esa forma se mantiene la condición de estabilidad, el código se hizo de la siguiente forma, tal como se presentó en clase:
+    
+    \begin{lstlisting}[language=Python,caption=Código para ejercicio 1]
+function U=onda(f,g,a,b,v,h,k)
+n=a/h+1;
+m=b/k+1;
+r=v*k/h;
+r
+r1=r^2;
+r2=r^2/2;
+s1=1-r^2;
+s2=2*(1-r^2);
+U=zeros(n,m);
+for i=2:n-1
+  U(i,1)=feval(f,h*(i-1));
+  U(i,2)=s1*feval(f,h*(i-1))+k*feval(g,h*(i-1))+r2*(feval(f,h*i)+feval(f,h*(i-2)));
+end
+
+for j=2:m-1
+  for i=2:n-1
+      U(i,j+1)= s2*U(i,j)+r1*(U(i-1,j)+U(i+1,j))-U(i,j-1);
+  end
+  surfc(U)
+end
+
+
+\end{lstlisting}
+
+
+Hay que ver que para este problema, se usa dos funciones, f y g, que se definen en código de la siguiente manera:
+
+   \begin{lstlisting}[language=Python,caption=Función f]
+function y=f(x)
+  y=x^2-x+sin(2*pi*x)
+endfunction
+\end{lstlisting}
+
+  \begin{lstlisting}[language=Python,caption=Función g]
+function y=g(a)
+  y=0;
+endfunction
+\end{lstlisting}
+
+Al ejecutar este código la gráfica queda de la siguiente manera, hay que resaltar que se cambiaron los valores de h y k, para este problema, pero que cumpla con la condición de estabilidad, los valore cambiados se detallan en la parte superior:
+
+\begin{figure}[H]
+        \centering
+         \includegraphics[width=1.1\textwidth]{1.png}
+        \caption{Resultado}
+\end{figure}   
+
+Se puede apreciar la correspondiente gráfica.
+
+\newpage
+\item Verifique que si no cumple $r\leq 1$, como se verán los resultados?\\
+ \vspace{0.2 cm}
+Para este problema,se cambio los valores de h y k a 0.1 y 0.2 respectivamente, de esa forma podemos darnos cuenta que no cumple la condición de estabilidad, ya que r nos saldría 4, por ende obtenemos esta gráfica:
+\begin{figure}[H]
+        \centering
+         \includegraphics[width=1.1\textwidth]{2.png}
+        \caption{Resultado}
+\end{figure} 
+\end{enumerate}
+\vspace{0.3 cm}
+\section{Problema desafío}
+\begin{enumerate}
+    \item Use  Use a = 1, b = 1, v = 1, $g(x) = 0$,\\
+  \vspace{0.5 cm}
+  $  f(x)= \left\{ \begin{array}{lcc}
+             2x &   si  & 0 \leq x \leq 1/2 \\
+             \\ 2-2x &  si & 1/2 \leq x \leq 1 \\
+            
+             \end{array}
+   \right.
+   $
+   \\
+  
+  \newpage
+  
+   \vspace{0.5 cm}
+   Para este problema solo se cambio la función f que nos siguiere este problema, para esto se realizó en código de la siguiente manera:
+   
+    \begin{lstlisting}[language=Python,caption=Función f]
+function y=f2x(x)
+  if (x>=0 && x<=0.5)
+    y=2*x;
+  end
+  if (x>=0.5 && x<=1)
+    y=2-2*x;
+  end
+endfunction
+
+\end{lstlisting}
+   
+Ahora si realizamos un surf a partir de esta función, podemos apreciar la siguiente gráfica:
+\begin{figure}[H]
+        \centering
+         \includegraphics[width=1.1\textwidth]{3.png}
+        \caption{Resultado}
+\end{figure} 
+
+Ahora si le damos otra perspectiva a esta gráfica, o sea cambiarle de orientación podríamos obtener lo siguiente:
+\begin{figure}[H]
+        \centering
+         \includegraphics[width=1.1\textwidth]{4.png}
+        \caption{Resultado}
+\end{figure} 
+
+Ahora, también se puede tener otra perspectiva, como cuando la onda llega a 0 y de ahí se vuelve a levantar, se podría apreciar gráficamente, algo así:
+
+\begin{figure}[H]
+        \centering
+         \includegraphics[width=1.1\textwidth]{5.png}
+        \caption{Resultado}
+\end{figure} 
+
+En la gráfica anterior se puede ver una comparativa, de como es cuando llego a 0 y empieza a elevarse otra vez, de esa forma podemos hacer una comparativa, entre el movimiento que se genero, cuando estaba descendiendo, y con el que se estaba creciendo nuevamente.
+
+\vspace{0.4 cm}
+\item Haga una secuencia de evolución paso a paso y que se grafique en forma independiente, ejemplo,
+utilice la instrucción subplot(10,10,x). Subplot(10,10,1) para j=1, Subplot(10,10,2) para j=2,
+etc.
+ 
+ \vspace{0.2 cm}
+ Para este problema se obtuvo las siguientes gráficas, para unos 30 momentos de nuestra matriz:
+ \begin{figure}[H]
+        \centering
+         \includegraphics[width=1.1\textwidth]{6.png}
+        \caption{Resultado}
+\end{figure} 
+
+Si agrandamos un poco más el número de visualizaciones por cada fila de nuestra matriz, podemos obtener una mejor perspectiva:
+Para este problema se obtuvo las siguientes gráficas, para unos 30 momentos de nuestra matriz:
+ \begin{figure}[H]
+        \centering
+         \includegraphics[width=1.1\textwidth]{7.png}
+        \caption{Resultado}
+\end{figure} 
+ 
+ 
+\end{enumerate}
+
+ 
+
+
+
+\end{flushleft}
+\end{document}
